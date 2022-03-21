@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends 'layout.html' %}
+{% block css %}
+<link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/home.css') }}">
+{% endblock %}
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <form id="submittwitterHashtag" method="post" title="Home">
+                <div class="submission">
+                    <label>Twitter Company Hashtag Crawler</label><br><br>
+                    <label for="twitterHashtag"></label><br>
+                    <input type="text" placeholder="Enter twitter hashtag" id="twitterHashtag" name='twitterHashtag'><br><br>
+                    <input type="submit" value="Crawl">
+                </div><br>
+            </form>
+</head>
+<body>
+
+</body>
+{% endblock %}
+</html>

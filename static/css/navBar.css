@@ -1,0 +1,37 @@
+.bar ul{
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    margin-left: -1rem;
+    margin-top: -1rem;
+    overflow-x: hidden;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(#040404, #1F1E1E);
+}
+
+.bar ul li{
+    width: 100%;
+}
+
+.bar ul li a{
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px;
+    font-size: 20px;
+    font-weight: 800;
+    text-decoration: none;
+}
+.bar ul li a span{
+   padding: 9px;
+}
+
+.bar ul li a:hover{
+    background: linear-gradient(to bottom, #171a21, #040404) fixed;
+}
+
+.bar ul li form{
+    alignment: right;
+}
