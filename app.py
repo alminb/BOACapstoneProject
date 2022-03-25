@@ -31,16 +31,20 @@ def results():
             counter = df.size
         print('Number of Tweets : ' + str(counter))
         max_results = 100
-        extracted_tweets = "snscrape --format '{content!r}'" + f" --max-results {max_results} --since {from_date} twitter-search '{search_term}' > extracted-tweets.txt"
+        extracted_tweets = "snscrape --format ~{content!r}~" + f" --max-results {max_results} --since {from_date} twitter-search '{search_term}' > extracted-tweets.txt"
         os.system(extracted_tweets)
+
+        tweets=[]
+
         if os.stat("extracted-tweets.txt").st_size == 0:
             print("No tweets found")
         else:
-            df = pd.read_csv('extracted-tweets.txt',delimiter="''",skipinitialspace=True, names=['content'])
+            df = pd.read_csv('extracted-tweets.txt',delimiter="~~",skipinitialspace=True, names=['content'])
             for row in df['content'].iteritems():
-                print(row)
+                print(row[1][1:-1])
+                tweets.append(row[1][1:-1])
 
-        return render_template("results.html")
+        return render_template("results.html",tweets=tweets)
 
 @app.route('/about')
 def about():

@@ -13,3 +13,31 @@ html{
     border-radius: 8px;
     color: #FFFFFF;
 }
+
+h1{
+    text-align: center;
+    color: white;
+}
+
+body{
+    color: white;
+}
+.table{
+}
+.thead{
+    margin-left: 10px;
+    text-align: center;
+}
+.table_header{
+    text-align: center;
+    background-color: black;
+    margin-left: 10px;
+}
+.table_row:nth-child(odd){
+    background-color: #1a1a1a;
+
+}
+.table_cell{
+    padding: 8px ;
+    color: white;
+}
