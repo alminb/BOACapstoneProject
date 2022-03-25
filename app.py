@@ -27,7 +27,7 @@ def results():
         if os.stat("result-tweets.txt").st_size == 0:
             counter = 0
         else:
-            df = pd.read_csv('result-tweets.txt',on_bad_lines='skip',names=['link'])
+            df = pd.read_csv('result-tweets.txt',names=['link'])
             counter = df.size
         print('Number of Tweets : ' + str(counter))
         max_results = 100
