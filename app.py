@@ -17,12 +17,14 @@ def home():
 @app.route('/results',methods=['POST','GET'])
 def results():
     if request.method == 'POST':
+        print("1")
         start_day = date.today()
         end_date = start_day
         print(end_date)
         twitterHashtag = request.form['twitterHashtag']
         search_term = "#"+twitterHashtag
-        from_date = "2022-03-22"
+        from_date = request.form['from_date']
+        print("from_date: ", from_date)
         os.system(f"snscrape --since {from_date} twitter-search '{search_term}' > result-tweets.txt")
         if os.stat("result-tweets.txt").st_size == 0:
             counter = 0
