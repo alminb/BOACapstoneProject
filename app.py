@@ -17,7 +17,7 @@ def home():
 @app.route('/results',methods=['POST','GET'])
 def results():
     if request.method == 'POST':
-        print("1")
+        print("In POST")
         start_day = date.today()
         end_date = start_day
         print(end_date)
