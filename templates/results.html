@@ -12,14 +12,19 @@
 <body>
 <table class="table">
     <tr class="table_header">
-        <thead class="table_cell">Tweet Content</thead>
+        <td>Original Tweets</td>
+        <td>Cleaned Tweets Only</td>
+        <td>Sentiment</td>
     </tr>
     {% for tweet in tweets %}
         <tr class="table_row">
         <td class="table_cell" style="color:white">{{ tweet }}</td>
+        <td class="table_cell" style="color:white">{{ cleanedTweets[loop.index] }}</td>
+        <td class="table_cell" style="color:white">{{ cleanedSentiments[loop.index] }}</td>
         </tr>
     {% endfor %}
 </table>
+
 
 </body>
 {% endblock %}

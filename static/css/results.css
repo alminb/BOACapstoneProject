@@ -25,13 +25,12 @@ body{
 .table{
 }
 .thead{
-    margin-left: 10px;
     text-align: center;
 }
 .table_header{
     text-align: center;
     background-color: black;
-    margin-left: 10px;
+    size: 20px;
 }
 .table_row:nth-child(odd){
     background-color: #1a1a1a;

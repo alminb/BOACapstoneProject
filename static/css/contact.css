@@ -2,3 +2,14 @@ html{
     font-family: Georgia, serif;
     background: linear-gradient(to bottom, #272727, #252424) fixed;
 }
+
+.submission {
+    text-align: center;
+    margin: auto;
+    width: 50%;
+    height: 100%;
+    padding: 20px;
+    background: linear-gradient(#2a475e, #395f7f);
+    border-radius: 8px;
+    color: #FFFFFF;
+}

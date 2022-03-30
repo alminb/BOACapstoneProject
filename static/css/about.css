@@ -2,3 +2,14 @@ html{
     font-family: Georgia, serif;
     background: linear-gradient(to bottom, #272727, #252424) fixed;
 }
+
+.infobox {
+    text-align: center;
+    margin: auto;
+    width: 50%;
+    height: 100%;
+    padding: 5px;
+    background: linear-gradient(#4f5b66, #343d46);
+    border-radius: 8px;
+    color: #FFFFFF;
+}

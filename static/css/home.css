@@ -6,10 +6,21 @@ html{
 .submission {
     text-align: center;
     margin: auto;
-    width: 20%;
+    width: 30%;
     height: 100%;
     padding: 20px;
-    background: linear-gradient(#2a475e, #395f7f);
+    background: linear-gradient(#4d6b53, #364b3a);
+    border-radius: 8px;
+    color: #FFFFFF;
+}
+
+.submissionOFF {
+    text-align: center;
+    margin: auto;
+    width: 30%;
+    height: 100%;
+    padding: 20px;
+    background: linear-gradient(#614041, #6D2B2C);
     border-radius: 8px;
     color: #FFFFFF;
 }

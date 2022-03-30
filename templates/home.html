@@ -10,10 +10,35 @@
     <title>Home</title>
     <form action="/results" id="submittwitterHashtag" method="post" title="Home">
                 <div class="submission">
-                    <label>Twitter Company Hashtag Crawler</label><br><br>
-                    <label for="twitterHashtag"></label><br>
+                    <label><h2>Twitter Company Hashtag Crawler</h2></label>
+                    <label for="twitterHashtag">#</label>
                     <input type="text" placeholder="Enter twitter hashtag" id="twitterHashtag" name='twitterHashtag'><br><br>
-                    <input id="from_date" name="from_date" type="date" min="2022-03-22">
+                    <label for="from_date">Start date: </label>
+                    <input id="from_date" name="from_date" type="date" max={{ today_date }}>
+                    <input type="submit" value="Crawl">
+                </div><br>
+            </form>
+
+    <form action="/results" id="submitcompanyName" method="post" title="Home">
+                <div class="submissionOFF">
+                    <label><h2>Company News Article Crawler</h2></label>
+                    <label for="companyName">Name of Company: </label>
+                    <input type="text" placeholder="Enter company name." id="companyName" name='companyName'><br><br>
+                    <label for="from_date">Start date: </label>
+                    <input id="from_date" name="from_date" type="date" max="{{ today_date }}">
+                    <input type="submit" value="Crawl">
+                </div><br>
+            </form>
+
+    <form action="/results" id="submitBothSources" method="post" title="Home">
+                <div class="submissionOFF">
+                    <label><h2>Twitter and News Article Crawler</h2></label>
+                    <label for="twitterHashtag">#</label>
+                    <input type="text" placeholder="Enter twitter hashtag" id="twitterHashtag" name='twitterHashtag'><br><br>
+                    <label for="companyName">Name of Company: </label>
+                    <input type="text" placeholder="Enter company name." id="companyName" name='companyName'><br><br>
+                    <label for="from_date">Start date: </label>
+                    <input id="from_date" name="from_date" type="date" max="{{ today_date }}">
                     <input type="submit" value="Crawl">
                 </div><br>
             </form>
