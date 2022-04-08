@@ -35,3 +35,20 @@
 .bar ul li form{
     alignment: right;
 }
+
+::-webkit-scrollbar {
+  width: 2px;
+  height: 1px;
+}
+
+::-webkit-scrollbar-track {
+  background: linear-gradient(to bottom, #272727, #252424) fixed;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

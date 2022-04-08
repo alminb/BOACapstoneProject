@@ -2,34 +2,36 @@
 <html lang="en">
 {% extends 'layout.html' %}
 {% block css %}
-<link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/results.css') }}">
+<link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/resultsNews.css') }}">
 {% endblock %}
 {% block content %}
 <head>
     <meta charset="UTF-8">
     <title>Results</title>
 </head>
+
+
 <body>
 
 <div class="row">
     <div class="column">
         <table class="styled-table">
-            <thead>
-                <tr>
-                    <th>Original Tweets</th>
-                    <th>Cleaned Tweets Only</th>
-                    <th>Sentiment</th>
-                </tr>
+          <thead>
+            <tr>
+              <th>Article Title</th>
+              <th>Article Text</th>
+              <th>Sentiment</th>
+            </tr>
             </thead>
-            <tbody>
-                {% for tweet in tweets %}
+                <tbody>
+                {% for article in articles %}
                     <tr>
-                        <td><div style="height: 100px; overflow-x: hidden; overflow-y:scroll">{{ tweet }}</div></td>
-                        <td><div style="height: 100px; overflow-x: hidden; overflow-y:scroll">{{ cleanedTweets[loop.index - 1] }}</div></td>
-                        <td>{{ cleanedSentiments[loop.index - 1] }}</td>
+                        <td><div style="height: 100px; overflow-x: hidden; overflow-y:scroll">{{ article.title }}</div></td>
+                        <td><div style="height: 100px; overflow-x: hidden; overflow-y:scroll">{{ article.text }}</div></td>
+                        <td>WIP</td>
                     </tr>
                 {% endfor %}
-            </tbody>
+                </tbody>
         </table>
     </div>
     <div class="column2">
@@ -48,8 +50,9 @@
         <figcaption>Work in Progress</figcaption>
         </figure>
     </div>
-</div>
 
+
+</div>
 
 </body>
 {% endblock %}

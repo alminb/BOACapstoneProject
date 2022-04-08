@@ -2,12 +2,10 @@ html{
     font-family: Georgia, serif;
     background: linear-gradient(to bottom, #272727, #252424) fixed;
 }
-
 h1{
     text-align: center;
     color: white;
 }
-
 body{
     color: white;
 }

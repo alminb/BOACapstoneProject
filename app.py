@@ -1,12 +1,14 @@
 import os
 import pandas as pd
 from datetime import date
+from datetime import timedelta
 from flask import Flask,request,render_template,session,redirect,url_for,flash
 
 import matplotlib.pyplot as plt
 import numpy as np
 import re
 import nltk
+from langdetect import detect
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.corpus import stopwords
@@ -20,8 +22,14 @@ from nltk.tokenize import RegexpTokenizer
 from nltk.sentiment import SentimentIntensityAnalyzer
 import operator
 
+from pygooglenews import GoogleNews
+import newspaper
+import json
+import time
+
 app = Flask(__name__)
 
+nltk.download('gutenberg')
 
 @app.route('/')
 def entry():
@@ -35,36 +43,35 @@ def home():
     print(today_date)
     return render_template("home.html", today_date=today_date)
 
-@app.route('/results',methods=['POST','GET'])
-def results():
+@app.route('/resultsTwitter',methods=['POST','GET'])
+def resultsTwitter():
     if request.method == 'POST':
         #Twitter Crawler Start ---------------------------------------------------------------------
-        print("In POST")
-        start_day = date.today()
-        end_date = start_day
-        print(end_date)
         twitterHashtag = request.form['twitterHashtag']
         search_term = "#"+twitterHashtag
-        from_date = request.form['from_date']
-        print("from_date: ", from_date)
-        os.system(f"snscrape --since {from_date} twitter-search '{search_term}' > result-tweets.txt")
-        if os.stat("result-tweets.txt").st_size == 0:
-            counter = 0
-        else:
-            df = pd.read_csv('result-tweets.txt',names=['link'])
-            counter = df.size
-        print('Number of Tweets : ' + str(counter))
+
+        if 'from_date'in request.form:  #check if start date provided, else use yesterdays's date
+            if request.form['from_date']!='':
+                from_date = request.form['from_date']
+            else:
+                today = date.today()
+                from_date = today-timedelta(days=1)
+
         max_results = 100
-        extracted_tweets = "snscrape --format ~{content!r}~" + f" --max-results {max_results} --since {from_date} twitter-search '{search_term}' > extracted-tweets.txt"
+        extracted_tweets = "snscrape --format ~{content!r}~" + f" --max-results {max_results} --since {from_date}  twitter-search '{search_term}' > extracted-tweets.txt"
         os.system(extracted_tweets)
         tweets=[]
         if os.stat("extracted-tweets.txt").st_size == 0:
             print("No tweets found")
         else:
             df = pd.read_csv('extracted-tweets.txt',delimiter="~~",skipinitialspace=True, names=['content'])
-            for row in df['content'].iteritems():
-                print(row[1][1:-1])
-                tweets.append(row[1][1:-1])
+            rowCounter=0
+            for row in df['content'].items():
+                if detect(row[1][1:-1])=='en':
+                    tweets.append(row[1][1:-1])
+                else:
+                    df.drop(labels=[rowCounter],axis=0,inplace=True)
+                rowCounter+=1;
         # Twitter Crawler End ---------------------------------------------------------------------
 
         # Twitter Processor Start -----------------------------------------------------------------
@@ -72,6 +79,7 @@ def results():
         nltk.download('stopwords')
         nltk.download('omw-1.4')
         nltk.download('vader_lexicon')
+        nltk.download('gutenberg')
 
 
         # Twitter Processor CONTD -----------------------------------------------------------------
@@ -100,21 +108,54 @@ def results():
         cleanedTweets=[]
         df['New_cleanText'] = df['clean_text'].map(lambda s: preprocess(s))
         for row1 in df['New_cleanText'].iteritems():
-            print(row1)
             cleanedTweets.append(row1[1])
         # Twitter Processor End -------------------------------------------------------------------
         # Sentiment Analysis  -------------------------------------
         sia = SentimentIntensityAnalyzer()
-        df["sentiment_score2"] = df["New_cleanText"].apply(lambda x: sia.polarity_scores(x)["compound"])
+        df["sentiment_score2"] = df["content"].apply(lambda x: sia.polarity_scores(x)["compound"])
         df["sentiment2"] = np.select([df["sentiment_score2"] < 0, df["sentiment_score2"] == 0, df["sentiment_score2"] > 0],
                                     ['negative', 'neutral', 'positive'])
         cleanedSentiments=[]
         for row1 in df['sentiment2'].iteritems():
-            print(row1)
             cleanedSentiments.append(row1[1])
 
         # Sentiment Analysis ---------------------------------------
         return render_template("results.html",tweets=tweets,cleanedTweets=cleanedTweets, cleanedSentiments=cleanedSentiments)
+
+#results when using news article crawler only
+@app.route('/resultsNews',methods=['POST','GET'])
+def resultsNews():
+    if request.method=='POST':
+        companyName = request.form['companyName']
+        from_date=request.form['from_date']
+
+        gn = GoogleNews()
+        newsArticles = gn.search(companyName)
+        newsArticles = newsArticles['entries']
+        articles = []
+        for entry in newsArticles:
+            url = entry['link']
+            article = newspaper.Article(url=url, language='en')
+            article.download()
+            try:
+                article.parse();
+                article = {
+                    "title": str(article.title),
+                    "text": str(article.text),
+                    "authors": article.authors,
+                    "published_date": str(article.publish_date),
+                    "top_image": str(article.top_image),
+                    "videos": article.movies,
+                    "keywords": article.keywords,
+                    "summary": str(article.summary)
+                }
+                #print("----------"+article["title"] + "------:" + article["text"] + "\n\n")
+                articles.append(article);
+            except: #if url can not be parsed by parser go to next entry
+                continue
+
+        return render_template("resultsNews.html",articles=articles)
+
 
 @app.route('/about')
 def about():
