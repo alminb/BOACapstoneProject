@@ -19,14 +19,16 @@
                     <th>Original Tweets</th>
                     <th>Cleaned Tweets Only</th>
                     <th>Sentiment</th>
+                    <th>Date</th>
                 </tr>
             </thead>
             <tbody>
                 {% for tweet in tweets %}
                     <tr>
-                        <td><div style="height: 100px; overflow-x: hidden; overflow-y:scroll">{{ tweet }}</div></td>
-                        <td><div style="height: 100px; overflow-x: hidden; overflow-y:scroll">{{ cleanedTweets[loop.index - 1] }}</div></td>
+                        <td><div style="height: 100px; width:300px; overflow-x: hidden; overflow-y:scroll">{{ tweet }}</div></td>
+                        <td><div style="height: 100px; width:300px; overflow-x: hidden; overflow-y:scroll">{{ cleanedTweets[loop.index - 1] }}</div></td>
                         <td>{{ cleanedSentiments[loop.index - 1] }}</td>
+                        <td>{{ tweetDates[loop.index - 1] }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

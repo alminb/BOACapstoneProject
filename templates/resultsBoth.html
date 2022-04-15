@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends 'layout.html' %}
+{% block css %}
+<link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/resultsBoth.css') }}">
+{% endblock %}
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Results</title>
+</head>
+<body>
+
+<var id="date" data-value=""></var>
+<div class="row">
+    <div class="column">
+        <table id="newsTable" class="styled-table">
+          <thead>
+            <tr>
+                <th>Article Title</th>
+                <th>Article Text</th>
+                <th>Category</th>
+                <th>Keywords</th>
+                <th>Sentiment</th>
+                <th>Date</th>
+            </tr>
+            </thead>
+                <tbody>
+                {% for article in articles %}
+                    <tr>
+                        <td><div style="height: 100px; width: 150px; overflow-x: hidden; overflow-y:scroll">{{ article.title }}</div></td>
+                        <td><div style="height: 100px; width: 325px; overflow-x: hidden; overflow-y:scroll">{{ article.text }}</div></td>
+                        <td>wip</td>
+                        <td>wip</td>
+                        <td>wip</td>
+                        <td><button class="unstyled-button" id="dateButton" value="{{ article.published_date }}" onclick="showTweets(this.value)">{{ article.published_date }}</button></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+        </table>
+    </div>
+    <div class="column">
+        <table id="tweetsTable" class="styled-table" name="">
+            <thead>
+                <tr>
+                    <th>Tweet</th>
+                    <th>Category</th>
+                    <th>Keywords</th>
+                    <th>Sentiment</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tweet in tweets %}
+                    <tr>
+                        <td><div style="height: 100px; width:300px; overflow-x: hidden; overflow-y:scroll">{{ tweet }}</div></td>
+                        <td>wip</td>
+                        <td>wip</td>
+                        <td>{{ cleanedSentiments[loop.index - 1] }}</td>
+                        <td>{{ tweetDates[loop.index - 1] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>;
+    function showTweets(date) {
+        var table, rows, i, x;
+      table = document.getElementById("tweetsTable");
+      rows = table.rows;
+      for (i = 1; i < (rows.length ); i++) {
+          x = rows[i].getElementsByTagName("td")[4];
+          if (x.innerHTML != date) {
+            rows[i].style.display = "none";
+          }
+          else {
+              rows[i].style.display = "block";
+          }
+        }
+    }
+
+</script>
+</body>
+
+{% endblock %}
+</html>

@@ -18,9 +18,11 @@
         <table class="styled-table">
           <thead>
             <tr>
-              <th>Article Title</th>
-              <th>Article Text</th>
-              <th>Sentiment</th>
+                <th>Article Title</th>
+                <th>Article Text</th>
+                <th>Category</th>
+                <th>Keywords</th>
+                <th>Date</th>
             </tr>
             </thead>
                 <tbody>
@@ -28,7 +30,9 @@
                     <tr>
                         <td><div style="height: 100px; overflow-x: hidden; overflow-y:scroll">{{ article.title }}</div></td>
                         <td><div style="height: 100px; overflow-x: hidden; overflow-y:scroll">{{ article.text }}</div></td>
-                        <td>WIP</td>
+                        <td>wip</td>
+                        <td>wip</td>
+                        <td>{{ article.published_date }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
