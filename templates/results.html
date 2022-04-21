@@ -17,7 +17,8 @@
             <thead>
                 <tr>
                     <th>Original Tweets</th>
-                    <th>Cleaned Tweets Only</th>
+                    <th>Cleaned Text</th>
+                    <th>Category</th>
                     <th>Sentiment</th>
                     <th>Date</th>
                 </tr>
@@ -27,6 +28,7 @@
                     <tr>
                         <td><div style="height: 100px; width:300px; overflow-x: hidden; overflow-y:scroll">{{ tweet }}</div></td>
                         <td><div style="height: 100px; width:300px; overflow-x: hidden; overflow-y:scroll">{{ cleanedTweets[loop.index - 1] }}</div></td>
+                        <th>{{ topicsofTweets[loop.index - 1] }}</th>
                         <td>{{ cleanedSentiments[loop.index - 1] }}</td>
                         <td>{{ tweetDates[loop.index - 1] }}</td>
                     </tr>
@@ -36,19 +38,38 @@
     </div>
     <div class="column2">
         <figure data-title="Samples by Category">
-        <figcaption>Work in Progress</figcaption>
+        <figcaption style="height: 100%; overflow: auto">
+            {% for topic in topicCount %}
+                Category {{ topic[0] }}: {{ topic[1] }} samples <br>
+            {% endfor %}
+        </figcaption>
         </figure>
         <figure data-title="Keyword Cloud">
-        <figcaption>Work in Progress</figcaption>
+        <figcaption><img src="/static/pywordcloud1.png" style="width:100%; height: 100%"></figcaption>
         </figure>
     </div>
     <div class="column2">
         <figure data-title="Sentiment by Category">
         <figcaption>Work in Progress</figcaption>
         </figure>
-        <figure data-title="Keyword Cloud">
-        <figcaption>Work in Progress</figcaption>
-        </figure>
+
+        <table class="styled-table" style="width: 400px; height: 350px">
+          <thead>
+            <tr>
+                <th>Category #</th>
+                <th>Keywords</th>
+            </tr>
+            </thead>
+                <tbody>
+                {% for topic in topicsKey %}
+                    <tr>
+                        <td><div style="height: 100px; overflow-x: hidden; overflow-y:scroll">Category {{ loop.index - 1}} </div></td>
+                        <td><div style="height: 100px; overflow-x: hidden; overflow-y:scroll">{{ topicsKey[loop.index - 1] }}</div></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+
+        </table>
     </div>
 </div>
 
