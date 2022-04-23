@@ -24,11 +24,33 @@ body{
     flex: 25%;
     padding: 5px;
 }
+.containerBar {
+    width: 100%;
+    background-color: dimgray;
+
+}
+.sentimentBar {
+    width: 100%;
+    background-color: dimgray;
+    padding-bottom: 10px;
+}
+.sentimentBar div{
+    float:left;
+    height: 100%;
+    text-align: center;
+}
+
+.fillinBar{
+    background-color: #009879;
+    text-align: center;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    color: white;
+}
 
 figure{
-
     width:300px;
-    height:220px;
+    height:300px;
     border-radius:4px;
     border:2px solid #ccc;
     position:relative;
@@ -48,6 +70,9 @@ figure:before {
     line-height: 40px;
     text-indent: 10px;
     border-bottom: 2px solid #ccc;
+}
+figcaption{
+    font-family: sans-serif;
 }
 
 

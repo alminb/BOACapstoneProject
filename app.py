@@ -84,11 +84,20 @@ def resultsTwitter():
             else:
                 today = date.today()
                 from_date = today-timedelta(days=1)
+        if 'desired_categories' in request.form:
+            if request.form['desired_categories']:
+                desired_categories = request.form['desired_categories']
+            else:
+                desired_categories = 11
 
         max_results = 1000
         extracted_tweets = "snscrape --format ~{date}~~{content!r}~" + f" --max-results {max_results} --since {from_date}  twitter-hashtag '{search_term}' > extracted-tweets.txt"
         os.system(extracted_tweets)
         tweets=[]
+
+        preDecidedTopics = ["ATM", "Bill Pay", "Credit Card", "Mobile Banking", "Online Banking", "Online Login",
+                  "Funds Transfer", "Deposit", "Fees",]
+        preTopicsDict = []
         if os.stat("extracted-tweets.txt").st_size == 0:
             print("No tweets found")
         else:
@@ -99,7 +108,22 @@ def resultsTwitter():
                     tweets.append(row[1][1:-1])
                 else:
                     df.drop(labels=[rowCounter],axis=0,inplace=True)
-                rowCounter+=1;
+                rowCounter += 1;
+            rowCounter=0
+            for row in df['content'].items():
+                preTopicsDict.append([])
+                for topics in preDecidedTopics:
+                    if topics.lower() in (row[1][1:-1]).lower():
+                        preTopicsDict[rowCounter]+=[topics]
+                if preTopicsDict[rowCounter] == []:
+                    preTopicsDict[rowCounter]+=["Other"]
+                rowCounter += 1;
+        print(preTopicsDict)
+
+
+
+
+
         #-----------------------------------------------------------Twitter Crawler End-----------------------------------------------------------
 
         #-----------------------------------------------------------Twitter Processor Start-----------------------------------------------------------
@@ -153,12 +177,12 @@ def resultsTwitter():
         for row1 in df['content'].iteritems():
             cleanedTweets.append(row1[1])
 
-        # TF-IDF
+        #----------------------------------------TF-IDF----------------------------------------
         STOPWORDS = stopwords.words('english')
-        vect = TfidfVectorizer(stop_words=STOPWORDS, max_features=2000)
+        vect = TfidfVectorizer(stop_words=STOPWORDS, max_features=2500)
         vect_text = vect.fit_transform(df['content'])
-        # LDA
-        lda_model = LatentDirichletAllocation(n_components=30,
+        #----------------------------------------LDA----------------------------------------
+        lda_model = LatentDirichletAllocation(n_components=int(desired_categories),
                                               learning_method='online', random_state=100, max_iter=20)
         lda_top = lda_model.fit_transform(vect_text)
         # find top 10 words in each topic
@@ -180,27 +204,20 @@ def resultsTwitter():
             topic_index.append(maxi(topic))
             topicofTweet.append(""+str(maxi(topic)))
         df['topic_index'] = topic_index
+
+        topicTotalSamplesCounter=0;
         topicsampleCount = {}
         for x in topicofTweet:
+            topicTotalSamplesCounter+=1;
             if x not in topicsampleCount:
                 topicsampleCount[x] = 1
             else:
                 topicsampleCount[x] += 1
         topicsampleCount = sorted(topicsampleCount.items(), key=lambda x: x[1], reverse=True)
+        topicSamplePercentages = []
+        for x in topicsampleCount:
+            topicSamplePercentages.append(str((x[1]/topicTotalSamplesCounter)*100)+"%")
 
-        X = df['content'].values
-        y = df['topic_index'].values.reshape(-1, 1)
-
-        vectorizer = TfidfVectorizer()
-        X = vectorizer.fit_transform(X)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-
-        # Random Forest for tweets
-        from sklearn.ensemble import RandomForestClassifier
-        forest = RandomForestClassifier(n_estimators=123, random_state=18, max_depth=300)
-        forest.fit(X_train, y_train)
-        y_pred_forest = forest.predict(X_test)
-        print("Accuracy:", metrics.accuracy_score(y_test, y_pred_forest))
 
         #-----------------------------------------------------------Twitter Processor End-----------------------------------------------------------
 
@@ -217,8 +234,33 @@ def resultsTwitter():
         for row in df['date'].iteritems():
             dates.append(row[1][1:11])
 
-        # keyword cloud
-        w = wordcloud.WordCloud(background_color="rgba(255, 255, 255, 0)", mode="RGBA")
+
+        # ---------sentiment analysis html table dictionaries------------
+        sentimentCategoryTotals={}
+        for index,row in df.iterrows():
+            if str(row["topic_index"]) not in sentimentCategoryTotals:
+                sentimentCategoryTotals[str(row["topic_index"])]={"positive":0,"negative":0,"neutral":0,"total":1,"poscent":"0%","negcent":"0%","neucent":"0%"}
+                sentimentCategoryTotals[str(row["topic_index"])][row["sentiment2"]]=1
+            elif str(row["topic_index"]) in sentimentCategoryTotals:
+                sentimentCategoryTotals[str(row["topic_index"])][row["sentiment2"]] += 1;
+                sentimentCategoryTotals[str(row["topic_index"])]["total"] += 1;
+        for x in sentimentCategoryTotals:
+            sentimentCategoryTotals[x]["poscent"]=str(sentimentCategoryTotals[x]["positive"]/sentimentCategoryTotals[x]["total"]*100)+"%";
+            sentimentCategoryTotals[x]["negcent"] = str(
+                sentimentCategoryTotals[x]["negative"] / sentimentCategoryTotals[x]["total"] * 100) + "%";
+            sentimentCategoryTotals[x]["neucent"] = str(
+                sentimentCategoryTotals[x]["neutral"] / sentimentCategoryTotals[x]["total"] * 100) + "%";
+        sentCatOrder=sorted(sentimentCategoryTotals,key=lambda x:sentimentCategoryTotals[x]["poscent"],reverse=True)
+
+        print(sentimentCategoryTotals)
+        print(sentCatOrder)
+
+
+
+        # -----------------------------------------------------------Sentiment Analysis end-----------------------------------------------------------
+
+        # --------------------------------------keyword cloud --------------------------------------
+        w = wordcloud.WordCloud(height= 400,background_color="rgba(255, 255, 255, 0)", mode="RGBA")
 
         def newsfunction(a):
             res = str()
@@ -233,10 +275,10 @@ def resultsTwitter():
         abc = newsfunction(new_data['keywords'])
         w.generate(abc)
         w.to_file("static/pywordcloud1.png")
+        # --------------------------------------keyword cloud end--------------------------------------
 
 
-        #-----------------------------------------------------------Sentiment Analysis end-----------------------------------------------------------
-        return render_template("results.html",tweets=tweets,topicsKey= topicsKey,topicsofTweets=topicofTweet,topicCount=topicsampleCount,cleanedTweets=cleanedTweets, cleanedSentiments=cleanedSentiments,tweetDates=dates)
+        return render_template("results.html",tweets=tweets,preTopicsDict=preTopicsDict,sentCatOrder=sentCatOrder,sentCatTots=sentimentCategoryTotals,topicsKey= topicsKey,topicsofTweets=topicofTweet,topicCount=topicsampleCount,topicSamplePercentages=topicSamplePercentages,cleanedTweets=cleanedTweets, cleanedSentiments=cleanedSentiments,tweetDates=dates)
 
 #results when using news article crawler only
 @app.route('/resultsNews',methods=['POST','GET'])
@@ -245,6 +287,11 @@ def resultsNews():
         print("Starting News Crawler")
         companyName = request.form['companyName']
         from_date=request.form['from_date']
+        if 'desired_categories' in request.form:
+            if request.form['desired_categories']:
+                desired_categories = request.form['desired_categories']
+            else:
+                desired_categories = 11
 
         #-----------------------------------------------------------NEWS CRAWLER START-----------------------------------------------------------
         gn = GoogleNews()
@@ -281,6 +328,18 @@ def resultsNews():
         STOPWORDS = stopwords.words('english')
         dfa = pd.DataFrame(articles)
         dfa.head()
+        preDecidedTopics = ["ATM", "Bill Pay", "Credit Card", "Mobile Banking", "Online Banking", "Online Login",
+                            "Funds Transfer", "Deposit", "Fees", ]
+        preTopicsDict = []
+        rowCounter=0;
+        for row in dfa['text'].items():
+            preTopicsDict.append([])
+            for topics in preDecidedTopics:
+                if topics.lower() in (row[1][1:-1]).lower():
+                    preTopicsDict[rowCounter] += [topics]
+            if preTopicsDict[rowCounter] == []:
+                preTopicsDict[rowCounter] += ["Other"]
+            rowCounter += 1;
 
         #-----------------------------------------------------------SENTIMENT-----------------------------------------------------------
         cleanedSentiments = []
@@ -292,13 +351,14 @@ def resultsNews():
         cleanedSentiments = []
         for row1 in dfa['sentiment2'].iteritems():
             cleanedSentiments.append(row1[1])
-        #-----------------------------------------------------------SENTIMENT-----------------------------------------------------------
+
+        #-----------------------------------------------------------SENTIMENT END-----------------------------------------------------------
 
         #-----------------------------------------------------------TOPIC ANALYZER START-----------------------------------------------------------
-        vect = TfidfVectorizer(stop_words=STOPWORDS, max_features=1000)
+        vect = TfidfVectorizer(stop_words=STOPWORDS, max_features=2500)
         vect_text = vect.fit_transform(dfa['text'])
 
-        lda_model = LatentDirichletAllocation(n_components=30,
+        lda_model = LatentDirichletAllocation(n_components=int(desired_categories),
                                               learning_method='online', random_state=100, max_iter=20)
         lda_top = lda_model.fit_transform(vect_text)
 
@@ -329,26 +389,46 @@ def resultsNews():
             topic_index.append(maxi(topic))
             topicofArticle.append(""+str(maxi(topic)))
 
-        topicsampleCount={}
+        topicTotalSamplesCounter = 0;
+        topicsampleCount = {}
         for x in topicofArticle:
+            topicTotalSamplesCounter += 1;
             if x not in topicsampleCount:
-                topicsampleCount[x]=1
+                topicsampleCount[x] = 1
             else:
-                topicsampleCount[x]+=1
+                topicsampleCount[x] += 1
         topicsampleCount = sorted(topicsampleCount.items(), key=lambda x: x[1], reverse=True)
+        topicSamplePercentages = []
+        for x in topicsampleCount:
+            topicSamplePercentages.append(str((x[1] / topicTotalSamplesCounter) * 100) + "%")
 
         print(topicofArticle)
         dfa['topic_index'] = topic_index
-        X = dfa['text'].values
-        y = dfa['topic_index'].values.reshape(-1, 1)
 
-        vectorizer = TfidfVectorizer()
-        X = vectorizer.fit_transform(X)
-        # print(X[0][0])
+        # ---------sentiment analysis html table dictionaries------------
+        sentimentCategoryTotals = {}
+        for index, row in dfa.iterrows():
+            if str(row["topic_index"]) not in sentimentCategoryTotals:
+                sentimentCategoryTotals[str(row["topic_index"])] = {"positive": 0, "negative": 0, "neutral": 0,
+                                                                    "total": 1, "poscent": "0%", "negcent": "0%",
+                                                                    "neucent": "0%"}
+                sentimentCategoryTotals[str(row["topic_index"])][row["sentiment2"]] = 1
+            elif str(row["topic_index"]) in sentimentCategoryTotals:
+                sentimentCategoryTotals[str(row["topic_index"])][row["sentiment2"]] += 1;
+                sentimentCategoryTotals[str(row["topic_index"])]["total"] += 1;
+        for x in sentimentCategoryTotals:
+            sentimentCategoryTotals[x]["poscent"] = str(
+                sentimentCategoryTotals[x]["positive"] / sentimentCategoryTotals[x]["total"] * 100) + "%";
+            sentimentCategoryTotals[x]["negcent"] = str(
+                sentimentCategoryTotals[x]["negative"] / sentimentCategoryTotals[x]["total"] * 100) + "%";
+            sentimentCategoryTotals[x]["neucent"] = str(
+                sentimentCategoryTotals[x]["neutral"] / sentimentCategoryTotals[x]["total"] * 100) + "%";
+        sentCatOrder = sorted(sentimentCategoryTotals, key=lambda x: sentimentCategoryTotals[x]["poscent"],
+                              reverse=True)
         #-----------------------------------------------------------TOPIC ANALYZER END-----------------------------------------------------------
         #-----------------------------------------------------------KEYWORD CLOUD START-----------------------------------------------------------
         #keyword cloud
-        w = wordcloud.WordCloud(background_color="rgba(255, 255, 255, 0)", mode="RGBA")
+        w = wordcloud.WordCloud(height= 400,background_color="rgba(255, 255, 255, 0)", mode="RGBA")
 
         def newsfunction(a):
             res = str()
@@ -365,7 +445,7 @@ def resultsNews():
         w.to_file("static/pywordcloud2.png")
         # -----------------------------------------------------------KEYWORD CLOUD END-----------------------------------------------------------
 
-        return render_template("resultsNews.html",articles=articles,topicsKey= topicsKey,topicsofArticle=topicofArticle,topicCount=topicsampleCount, sentiments=cleanedSentiments)
+        return render_template("resultsNews.html",preTopicsDict=preTopicsDict,sentCatOrder=sentCatOrder,sentCatTots=sentimentCategoryTotals,topicSamplePercentages=topicSamplePercentages,articles=articles,topicsKey= topicsKey,topicsofArticle=topicofArticle,topicCount=topicsampleCount, sentiments=cleanedSentiments)
 
 
 @app.route('/resultsBoth',methods=['POST','GET'])
@@ -480,8 +560,40 @@ def resultsBoth():
                 articles.append(article);
             except: #if url can not be parsed by parser go to next entry
                 continue
+        dfa = pd.DataFrame(articles)
+        dfa.head()
+        sia = SentimentIntensityAnalyzer()
+        dfa["sentiment_score2"] = dfa["text"].apply(lambda x: sia.polarity_scores(x)["compound"])
+        dfa["sentiment2"] = np.select(
+            [dfa["sentiment_score2"] < 0, dfa["sentiment_score2"] == 0, dfa["sentiment_score2"] > 0],
+            ['negative', 'neutral', 'positive'])
+        articleSentiments = []
+        for row1 in dfa['sentiment2'].iteritems():
+            articleSentiments.append(row1[1])
+        preDecidedTopics = ["ATM", "Bill Pay", "Credit Card", "Mobile Banking", "Online Banking", "Online Login",
+                            "Funds Transfer", "Deposit", "Fees", ]
+        preTopicsDictArticles = []
+        rowCounter = 0;
+        for row in dfa['text'].items():
+            preTopicsDictArticles.append([])
+            for topics in preDecidedTopics:
+                if topics.lower() in (row[1][1:-1]).lower():
+                    preTopicsDictArticles[rowCounter] += [topics]
+            if preTopicsDictArticles[rowCounter] == []:
+                preTopicsDictArticles[rowCounter] += ["Other"]
+            rowCounter += 1;
+        preTopicsDictTweets = []
+        rowCounter = 0;
+        for row in df['content'].items():
+            preTopicsDictTweets.append([])
+            for topics in preDecidedTopics:
+                if topics.lower() in (row[1][1:-1]).lower():
+                    preTopicsDictTweets[rowCounter] += [topics]
+            if preTopicsDictTweets[rowCounter] == []:
+                preTopicsDictTweets[rowCounter] += ["Other"]
+            rowCounter += 1;
 
-        return render_template("resultsBoth.html", articles=articles, tweets=tweets,cleanedTweets=cleanedTweets, cleanedSentiments=cleanedSentiments,tweetDates=dates)
+        return render_template("resultsBoth.html",articleSentiments=articleSentiments,preTopicsDictTweets=preTopicsDictTweets,preTopicsDictArticles=preTopicsDictArticles, articles=articles, tweets=tweets,cleanedTweets=cleanedTweets, cleanedSentiments=cleanedSentiments,tweetDates=dates)
 
 
 @app.route('/about')

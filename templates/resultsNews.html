@@ -20,6 +20,7 @@
             <tr>
                 <th>Article Title</th>
                 <th>Article Text</th>
+                <th>Topic</th>
                 <th>Category</th>
                 <th>Sentiment</th>
                 <th>Date</th>
@@ -30,6 +31,7 @@
                     <tr>
                         <td><div style="height: 100px; overflow-x: hidden; overflow-y:scroll">{{ article.title }}</div></td>
                         <td><div style="height: 100px; overflow-x: hidden; overflow-y:scroll">{{ article.text }}</div></td>
+                        <td><div style="text-align-all:center;height: 100px; overflow-x: hidden; overflow-y:scroll">{% for x in preTopicsDict[loop.index - 1 ] %}{{ x }}<br>{% endfor %}</div></td>
                         <td>{{ topicsofArticle[loop.index - 1] }}</td>
                         <td>{{ sentiments[loop.index - 1] }}</td>
                         <td>{{ article.published_date }}</td>
@@ -42,7 +44,10 @@
         <figure data-title="Samples by Category">
         <figcaption style="height: 100%; overflow: auto">
             {% for topic in topicCount %}
-                Category {{ topic[0] }}: {{ topic[1] }} samples <br>
+                Category {{ topic[0] }}
+                <div class="containerBar">
+                <div class="fillinBar" style="width:{{ topicSamplePercentages[loop.index - 1]}}">{{ topic[1] }}</div></div>
+                <br>
             {% endfor %}
         </figcaption>
         </figure>
@@ -52,7 +57,18 @@
     </div>
     <div class="column2">
         <figure data-title="Sentiment by Category">
-        <figcaption>Work in Progress</figcaption>
+        <figcaption style="height: 100%; overflow: auto">
+                {% for topic in sentCatOrder %}
+                    Category {{ topic }}
+                    <div class="sentimentBar">
+                        <div class="positiveBar" style="width:{{ sentCatTots[topic]["poscent"] }}; background-color: green">{{ sentCatTots[topic]["positive"] }}</div>
+                        <div class="neutralBar" style="width:{{ sentCatTots[topic]["neucent"] }}; background-color: gray">{{ sentCatTots[topic]["neutral"] }}</div>
+                        <div class="negativeBar" style="width:{{ sentCatTots[topic]["negcent"] }}; background-color: darkred">{{ sentCatTots[topic]["negative"] }}</div>
+                    </div>
+                    <br>
+                {% endfor %}
+
+            </figcaption>
         </figure>
 
         <table class="styled-table" style="width: 400px; height: 350px">

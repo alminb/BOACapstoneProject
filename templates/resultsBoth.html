@@ -19,8 +19,7 @@
             <tr>
                 <th>Article Title</th>
                 <th>Article Text</th>
-                <th>Category</th>
-                <th>Keywords</th>
+                <th>Topic</th>
                 <th>Sentiment</th>
                 <th>Date</th>
             </tr>
@@ -29,10 +28,12 @@
                 {% for article in articles %}
                     <tr>
                         <td><div style="height: 100px; width: 150px; overflow-x: hidden; overflow-y:scroll">{{ article.title }}</div></td>
-                        <td><div style="height: 100px; width: 325px; overflow-x: hidden; overflow-y:scroll">{{ article.text }}</div></td>
-                        <td>wip</td>
-                        <td>wip</td>
-                        <td>wip</td>
+                        <td><div style="height: 100px; width: 400px; overflow-x: hidden; overflow-y:scroll">{{ article.text }}</div></td>
+                        <td><div style="text-align:center;height: 100px; overflow-x: hidden; overflow-y:scroll">
+                            {% for x in preTopicsDictArticles[loop.index - 1 ] %}
+                                <button class="unstyled-button" id="topicButton" value="{{ x }}" onclick="showTweets1(this.value)">{{ x }}</button><br>
+                            {% endfor %}</div></td>
+                        <td>{{ articleSentiments[loop.index - 1]}}</td>
                         <td><button class="unstyled-button" id="dateButton" value="{{ article.published_date }}" onclick="showTweets(this.value)">{{ article.published_date }}</button></td>
                     </tr>
                 {% endfor %}
@@ -40,22 +41,17 @@
         </table>
     </div>
     <div class="column">
-        <table id="tweetsTable" class="styled-table" name="">
+        <table id="tweetsTable" class="styled-table" style="width: 100%">
             <thead>
                 <tr>
                     <th>Tweet</th>
-                    <th>Category</th>
-                    <th>Keywords</th>
-                    <th>Sentiment</th>
-                    <th>Date</th>
                 </tr>
             </thead>
             <tbody>
                 {% for tweet in tweets %}
-                    <tr>
-                        <td><div style="height: 100px; width:300px; overflow-x: hidden; overflow-y:scroll">{{ tweet }}</div></td>
-                        <td>wip</td>
-                        <td>wip</td>
+                    <tr style="display: block">
+                        <td><div style="height: 100px; width:600px; overflow-x: hidden; overflow-y:scroll">{{ tweet }}</div></td>
+                        <td><div style="text-align:center;height: 100px; overflow-x: hidden; overflow-y:scroll">{% for x in preTopicsDictTweets[loop.index - 1 ] %}{{ x }}<br>{% endfor %}</div></td>
                         <td>{{ cleanedSentiments[loop.index - 1] }}</td>
                         <td>{{ tweetDates[loop.index - 1] }}</td>
                     </tr>
@@ -65,12 +61,26 @@
     </div>
 </div>
 <script>;
+    function showTweets1(topic) {
+        var table, rows, i, x;
+      table = document.getElementById("tweetsTable");
+      rows = table.rows;
+      for (i = 1; i < (rows.length ); i++) {
+          x = rows[i].getElementsByTagName("td")[1];
+          if (x.innerHTML.toLowerCase().includes(topic.toLowerCase())) {
+            rows[i].style.display = "block";
+          }
+          else {
+              rows[i].style.display = "none";
+          }
+        }
+    }
     function showTweets(date) {
         var table, rows, i, x;
       table = document.getElementById("tweetsTable");
       rows = table.rows;
       for (i = 1; i < (rows.length ); i++) {
-          x = rows[i].getElementsByTagName("td")[4];
+          x = rows[i].getElementsByTagName("td")[3];
           if (x.innerHTML != date) {
             rows[i].style.display = "none";
           }
