@@ -1,7 +1,20 @@
-# BOACapstoneProject
-Smaller Scale Twitter Only Demo - https://boamobilecapstone.herokuapp.com/
-# Project Name:
-External User Experience Intelligence
+# Bank of America CapstoneProject - External User Experience Intelligence
+Smaller Scale Twitter Only Demo for Presentation - https://boamobilecapstone.herokuapp.com/
+# Home UI
+<img src="https://github.com/alminb/BOACapstoneProject/blob/master/homescreen.png" width=1000>
+
+# Twitter Crawler Results Screen
+<img src="https://github.com/alminb/BOACapstoneProject/blob/master/tweetscreen.png" width=1000>
+
+# News Article Crawler Results Screen
+<img src="https://github.com/alminb/BOACapstoneProject/blob/master/newsscreen.png" width=1000>
+
+# Both Sources Results Screen
+Note: This screen shows an example of looking for correlations between the two sources by clicking on a desired topic and in this case
+the fees topic was clicked on within the articles table to show all tweets from this topic. Date can also be clicked on to show tweets
+from the selected date.
+<img src="https://github.com/alminb/BOACapstoneProject/blob/master/bothscreen.png" width=1000>
+
 # Sponsor:
 Bank of America Business Unit
 # Objective:
