@@ -1,10 +1,6 @@
 # Bank of America CapstoneProject - External User Experience Intelligence
 Smaller Scale Twitter Only Demo for Presentation - https://boamobilecapstone.herokuapp.com/
 
-Project Manager: Suhayl Kahn
-
-Team Members: Almin Brdarevic, Chia-Jung Chu, Yixuan Han, Gaode Hu.    
-
 # Home UI
 <img src="https://github.com/alminb/BOACapstoneProject/blob/master/homescreen.png" width=1000>
 
