@@ -1,4 +1,5 @@
 # BOACapstoneProject
+Smaller Scale Twitter Only Demo - https://boamobilecapstone.herokuapp.com/
 # Project Name:
 External User Experience Intelligence
 # Sponsor:
