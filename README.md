@@ -50,6 +50,7 @@ state, city, timeframe, and service categories are out of scope.
 1. Workflow/process for continuously monitoring customer experience, reports, complaints and
 providing correlated insights from external signals about service performance
 2. UI for navigating the results.
+3. Foundation for Bank of America/future teams to build upon.
 # Project Assumptions:
 We should be following standard coding practices which BofA can leverage if they choose to.
 The sponsor wants the team to have adequate knowledge of python programing, using different
